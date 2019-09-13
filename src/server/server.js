@@ -19,7 +19,7 @@ server.get('/', (req, res) => {
       <body style="font-family: helvetica">
         <div id="app">${initialMarkup}</div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-            
+
         <script src="/main.js"></script>
       </body>
     </html>
