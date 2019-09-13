@@ -13,14 +13,14 @@ const App = () => {
   return (
     <>
       <nav style={{ marginBottom: '1rem' }}>
-        <div className="nav-wrapper blue-grey darken-1 z-depth-3">
+        <div className="nav-wrapper z-depth-3" style={{backgroundColor: "#0000ff"}}>
           <a href="#" className="brand-logo" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
           <ul className="right valign-wrapper" style={{ marginRight: '1.2rem' }}>
             <li>
               <div style={{ marginRight: '1.2rem' }}>USER:</div>
             </li>
             <li>
-              <select onChange={e => setUser(e.target.value)} className="browser-default" style={{ color: '#ffffff', backgroundColor: '#607d8b' }}>
+              <select onChange={e => setUser(e.target.value)} className="browser-default" style={{ color: '#ffffff', backgroundColor: 'transparent' }}>
                 <option value="" selected></option>
                 <option value="zach">Zach</option>
                 <option value="ana">Ana</option>
@@ -33,12 +33,12 @@ const App = () => {
 
 
       <div className="container" style={{ width: '90vw' }}>
-        <div className="row blue-grey-text" style={{ borderBottom: '0.2em solid #78909c' }}>
+        <div className="row" style={{ color: '#0000ff', borderBottom: '0.2em solid #0000ff' }}>
           <h3 style={{ fontWeight: 500 }}>Your week</h3>
         </div>
         <table style={{ tableLayout: 'fixed' }}>
           <thead>
-            <tr className="row blue-grey-text">
+            <tr className="row">
               <th style={{ width: '14.28%' }}>Monday</th>
               <th style={{ width: '14.28%' }}>Tuesday</th>
               <th style={{ width: '14.28%' }}>Wednesday</th>
@@ -55,9 +55,9 @@ const App = () => {
                 if (shiftInd >= 0) {
                   return (
                     <td>
-                      <div className="card blue-grey lighten-3 z-depth-2" style={{ padding: '0.5rem' }}>
+                      <div className="card z-depth-2" style={{ border: '2px solid #0000ff', padding: '0.5rem' }}>
                         <div className="card-title center-align"
-                          style={{ color: '#892d2d', fontSize: '1.2rem', fontWeight: '500', textTransform: 'uppercase' }}>
+                          style={{fontSize: '1.2rem', fontWeight: '700', textTransform: 'uppercase' }}>
                           {userShifts[shiftInd].building}
                         </div>
                         <hr style={{ width: '80%' }}></hr>
@@ -74,8 +74,8 @@ const App = () => {
             </tr>
           </tbody>
         </table>
-        <button className="right waves-effect waves-light btn-small blue-grey lighten-1"
-          style={{ marginTop: '3rem' }}>Add to Google Calendar</button>
+        <button className="right waves-effect waves-light btn-small"
+          style={{ marginTop: '3rem', backgroundColor: '#0000ff'}}>Add to Google Calendar</button>
       </div>
     </>
   )
