@@ -13,7 +13,7 @@ server.get('/', (req, res) => {
   res.send(`
     <html>
       <head>
-        <title>ArtTix Scheduloor</title>
+        <title>zschedul_</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
       </head>
       <body style="font-family: helvetica">
