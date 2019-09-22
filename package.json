@@ -1,9 +1,11 @@
 {
   "name": "arttix_scheduling",
   "description": "Scheduling app for ArtTix",
+  "private": true,
   "scripts": {
     "dev-server": "nodemon --exec babel-node src/server/server.js --ignore dist/ --ignore prog/",
-    "dev-bundle": "webpack -wd"
+    "dev-bundle": "webpack -wd",
+    "build": "webpack"
   },
   "repository": "https://github.com/vxxce/arttix_scheduling.git",
   "dependencies": {
