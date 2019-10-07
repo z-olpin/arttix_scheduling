@@ -19,9 +19,9 @@ server.get('/', (req, res) => {
   res.redirect('/index.html')
 })
 
-server.get('/employees/:id/shifts', async (req, res) => {
-  const result = await pool.query("select * from shifts")
-  res.send(result.rows)
+server.get('/employees/:name/shifts', async (req, res) => {
+  const result = await pool.query("select shifts.start, shifts.end, shifts.building_id, buildings.name, employees.name from shifts, employees, buildings where employees.name=$1 and shifts.employee_id=employees.employee_id and shifts.building_id=buildings.building_id", [req.params.name])
+  res.json(result.rows)
 })
 
-server.listen(PORT, () => console.log('Server is running...'));
+server.listen(PORT, () => console.log(`Server listening on ${PORT}...`));
