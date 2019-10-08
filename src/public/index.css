@@ -1,0 +1,180 @@
+html {
+  background: #fff;
+  font-family: helvetica, arial, sans-serif;
+}
+button {
+  flex-grow: 1;
+  font-size: 4rem;
+  color: #000;
+  border: 0;
+}
+
+button:hover {
+  cursor: pointer;
+  color: rgb(0,0,255);
+}
+
+button:focus{
+  background-color: #fff;
+}
+
+#schedule {
+  display: grid;
+  margin: 2rem;
+  padding: 2rem 0;
+  grid-template-columns: 0.5fr repeat(7, 1fr);
+  grid-template-rows: repeat(16, 1fr);
+  justify-items: center;
+  border-top: 0.3rem solid black;
+}
+
+#week-slider {
+  display: flex;
+  margin: 2rem;
+  justify-content: space-around;
+}
+
+#week-title {
+  display: inline-block;
+}
+
+.column-title {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+#monday {
+  grid-column: 2;
+}
+
+#tuesday {
+  grid-column: 3;
+}
+
+#wednesday {
+  grid-column: 4;
+}
+
+#thursday {
+  grid-column: 5;
+}
+
+#friday {
+  grid-column: 6;
+}
+
+#saturday {
+  grid-column: 7;
+}
+
+#sunday {
+  grid-column: 8;
+}
+
+#time8a {
+  grid-column: 1;
+  grid-row: 2 / span 2;
+  min-height: 4rem;
+}
+
+#time10a {
+  grid-column: 1;
+  grid-row: 4 / span 2;
+}
+
+#time12p {
+  grid-column: 1;
+  grid-row: 6 / span 2;
+}
+
+#time2p {
+  grid-column: 1;
+  grid-row: 8 / span 2;
+}
+
+#time4p {
+  grid-column: 1;
+  grid-row: 10 / span 2;
+}
+
+#time6p {
+  grid-column: 1;
+  grid-row: 12 / span 2;
+}
+
+#time8p {
+  grid-column: 1;
+  grid-row: 14 / span 2;
+}
+
+.shift {
+  background-color: lightgray;
+  margin: 0.3rem;
+  padding: 1.1rem;
+  border-radius: 0.7rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+#shift1 {
+  grid-column: 2;
+  grid-row: 4 / span 8;
+}
+
+#shift2 {
+  grid-column: 4;
+  grid-row: 6 / span 8;
+}
+
+#shift3 {
+  grid-column: 4;
+  grid-row: 10 / span 6;
+}
+
+#shift4 {
+  grid-column: 5;
+  grid-row: 4 / span 10;
+}
+#shift5 {
+  grid-column: 6;
+  grid-row: 10 / span 5;
+}
+#shift6 {
+  grid-column: 7;
+  grid-row: 4 / span 10;
+}
+
+#shift7 {
+  grid-column: 3;
+  grid-row: 6 / span 6;
+}
+
+#shift8 {
+  grid-column: 6;
+  grid-row: 3 / span 12;
+}
+
+#shift9 {
+  grid-column: 7;
+  grid-row: 8 / span 6;
+}
+
+#shift10 {
+  grid-column: 7;
+  grid-row: 2 / span 5;
+}
+
+#shift11 {
+  grid-column: 3;
+  grid-row: 2 / span 12;
+}
+
+#shift12 {
+  grid-column: 5;
+  grid-row: 4 / span 5;
+}
+
+#shift13 {
+  grid-column: 3;
+  grid-row: 3 / span 10;
+}
