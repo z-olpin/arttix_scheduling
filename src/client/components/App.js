@@ -28,7 +28,7 @@ const App = () => {
 
   return (
     <>
-      <nav style={{ marginBottom: '1rem', backgroundColor: 'rgb(0,0,255)' }}>
+      <nav style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
         <div>
           <a href="#" className="brand-logo" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
           <ul className="right valign-wrapper" style={{ marginRight: '1.2rem' }}>

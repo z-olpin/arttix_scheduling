@@ -1,8 +1,9 @@
 html {
-  background: #fff;
+  background: #C2AFA4;
   font-family: helvetica, arial, sans-serif;
 }
 .week-button {
+  background: transparent;
   flex-grow: 1;
   font-size: 4rem;
   color: #000;
@@ -11,11 +12,11 @@ html {
 
 .week-button:hover {
   cursor: pointer;
-  color: rgb(0,0,255);
+  color: #9F505E;
 }
 
 .week-button:focus{
-  background-color: #fff;
+  background: transparent;
 }
 
 #week-slider {
@@ -90,7 +91,8 @@ html {
 }
 
 .shift {
-  background-color: lightgray;
+  background-color: #606F7B;
+  color: rgb(235, 235, 235);
   margin: 0.7rem;
   padding: 1.1rem;
   border-radius: 0.7rem;
