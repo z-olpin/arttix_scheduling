@@ -57,21 +57,15 @@ const App = () => {
   return (
     <>
       <nav style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
-        <div>
-          <a href="#" className="brand-logo" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
-          <ul className="right valign-wrapper" style={{ marginRight: '1.2rem' }}>
-            <li>
-              <div style={{ marginRight: '1.2rem' }}>USER:</div>
-            </li>
-            <li>
-              <input id="user-input" type="select" onChange={handleUserChange} list="suggestions">
-              </input>
-              <datalist id="suggestions">
-                {suggestions.map(s => <option value={s}></option>)}
-              </datalist>
-            </li>
-          </ul>
-        </div>
+          <a href="#" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
+              <select id="user-input" onChange={handleUserChange}>
+                <option selected>User:</option>
+                <option>Zach</option>
+                <option>Alice</option>
+                <option>Bob</option>
+                <option>Charlie</option>
+                <option>Doug</option>
+              </select>
       </nav>
       <div id="week-slider">
         <button className="week-button">&#8592;</button>
@@ -95,7 +89,7 @@ const App = () => {
               <div className='shift' style={{ gridArea: defineGridArea(shift) }}>
                 {shift.building.split(' ').map(w => w[0].toUpperCase().concat(w.slice(1))).join(' ')}
                 <p />
-                {`${shift.startHour}:${shift.startMin}`} - {`${shift.endHour}:${shift.endMin}`}
+                {`${(parseInt(shift.startHour) > 12) ? parseInt(shift.startHour) - 12: shift.startHour}:${shift.startMin}`} - {`${(shift.endHour > 12) ? parseInt(shift.endHour - 12) : shift.endHour}:${shift.endMin}`}
               </div>
             )
           )

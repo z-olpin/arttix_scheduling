@@ -2,6 +2,15 @@ html {
   background: rgb(223, 211, 204);
   font-family: helvetica, arial, sans-serif;
 }
+
+#user-input {
+  display: inline-block;
+  position: absolute;
+  right: 1rem;
+  width:  max-content;
+  top: 0.5rem;
+}
+
 .week-button {
   background: transparent;
   flex-grow: 1;
