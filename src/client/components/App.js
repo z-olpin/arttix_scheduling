@@ -57,7 +57,7 @@ const App = () => {
   return (
     <>
       <nav style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
-          <a href="#" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
+          <a href="#" id="logo" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
               <select id="user-input" onChange={handleUserChange}>
                 <option selected>User:</option>
                 <option>Zach</option>

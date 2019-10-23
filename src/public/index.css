@@ -3,6 +3,10 @@ html {
   font-family: helvetica, arial, sans-serif;
 }
 
+#logo {
+  font-size: 2rem;
+}
+
 #user-input {
   display: inline-block;
   position: absolute;
