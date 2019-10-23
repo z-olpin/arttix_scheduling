@@ -55,27 +55,22 @@ server.get('/employees/:name/shifts', async (req, res) => {
     '45': 3
 }
 
-  let result = await pool.query(
-    'select extract(isodow from start) as dow, extract(doy from start) as doy, extract(hour from start) as start_hour, extract(minute from start) as start_min, extract(hour from "end") as end_hour, extract(minute from "end") as end_min, shifts.shift_id::integer, shifts.start, shifts.end, shifts.building_id, buildings.name as building, employees.name from shifts, employees, buildings where employees.name=$1 and shifts.employee_id=employees.employee_id and shifts.building_id=buildings.building_id order by shifts.start asc', [req.params.name]
-  )
-  // Convert to string in query (::text) or after?
-
-  // Do all this on server or client?
-
-  result = result.rows.map(row => {
-    row.start = row.start.toLocaleString('en-us', {hour12: false})
-    row.end = row.end.toLocaleString('en-us', {hour12: false})
-    row.start_min = row.start_min.toString().padStart(2, '0')
-    row.start_hour = row.start_hour.toString()
-    row.end_min = row.end_min.toString().padStart(2, '0')
-    row.end_hour = row.end_hour.toString()
-    row.dow = dows[row.dow]
-    row.gridStart = hourMap[row.start_hour] + minMap[row.start_min]
-    row.gridEnd = hourMap[row.end_hour] + minMap[row.end_min]
-    return row
-})
-
-  res.json(result)
+  let result = await pool.query('\
+    select\
+      shifts.shift_id::integer,\
+      shifts.start,\
+      shifts.end,\
+      shifts.building_id,\
+      buildings.name as building,\
+      employees.name\
+    from shifts, employees, buildings\
+    where\
+      employees.name=$1 and\
+      shifts.employee_id=employees.employee_id and\
+      shifts.building_id=buildings.building_id\
+    order by shifts.start asc\
+  ', [req.params.name])
+  res.json(result.rows)
 })
 
 server.listen(PORT, () => console.log(`Server listening on ${PORT}...`));

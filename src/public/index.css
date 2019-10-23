@@ -1,5 +1,5 @@
 html {
-  background: #C2AFA4;
+  background: rgb(223, 211, 204);
   font-family: helvetica, arial, sans-serif;
 }
 .week-button {
@@ -36,29 +36,9 @@ html {
 }
 
 .column-title {
+  padding-bottom: 0.5rem;
   font-weight: bold;
   text-transform: uppercase;
-}
-#monday {
-  grid-column: 2;
-}
-#tuesday {
-  grid-column: 3;
-}
-#wednesday {
-  grid-column: 4;
-}
-#thursday {
-  grid-column: 5;
-}
-#friday {
-  grid-column: 6;
-}
-#saturday {
-  grid-column: 7;
-}
-#sunday {
-  grid-column: 8;
 }
 
 #time8a {
@@ -91,34 +71,11 @@ html {
 }
 
 .shift {
-  background-color: #606F7B;
+  background-color: rgb(115, 131, 145);
   color: rgb(235, 235, 235);
-  margin: 0.7rem;
+  margin: 0;
   padding: 1.1rem;
   border-radius: 0.7rem;
   font-size: 1.2rem;
   text-align: center;
 }
-
-.monday  {
-  grid-column: 2;
-}
-.tuesday  {
-  grid-column: 3;
-}
-.wednesday  {
-  grid-column: 4;
-}
-.thursday  {
-  grid-column: 5;
-}
-.friday  {
-  grid-column: 6;
-}
-.saturday  {
-  grid-column: 7;
-}
-.sunday  {
-  grid-column: 8;
-}
-
