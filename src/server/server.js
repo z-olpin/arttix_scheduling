@@ -20,40 +20,6 @@ server.get('/', (req, res) => {
 })
 
 server.get('/employees/:name/shifts', async (req, res) => {
-  const dows = {
-    '1': 'monday',
-    '2': 'tuesday',
-    '3': 'wednesday',
-    '4': 'thursday',
-    '5': 'friday',
-    '6': 'saturday',
-    '7': 'sunday'
-}
-
-  const hourMap =  {
-    '8': 2,
-    '9': 6,
-    '10': 10,
-    '11': 14,
-    '12': 18,
-    '13': 22,
-    '14': 26,
-    '15': 30,
-    '16': 34,
-    '17': 38,
-    '18': 42,
-    '19': 46,
-    '20': 50,
-    '21': 54,
-    '22': 58
-}
-
-  const minMap = {
-    '00': 0,
-    '15': 1,
-    '30': 2,
-    '45': 3
-}
 
   let result = await pool.query('\
     select\
