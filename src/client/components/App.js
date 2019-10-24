@@ -4,7 +4,6 @@ import '../../public/index.css';
 
 const App = () => {
   const [user, setUser] = useState()
-  const [suggestions, setSuggestions] = useState(['Zach', 'Alice', 'Bob', 'Charlie', 'Doug'])
   const [shifts, setShifts] = useState()
 
   const presentMonday = format(startOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
@@ -76,7 +75,6 @@ const App = () => {
           } else {
             return shift
           }
-          break
         case 3:
           let _sshift = {...shift[0]}
           _sshift.end = shift[2].end
@@ -87,9 +85,7 @@ const App = () => {
           let switchShift = [shift[0], shift[1], shift[2]].find(s => s.building_id == buildingId)
           _sshift.notes = (shift[0].building_id !== shift[1].building_id || shift[0].building_id !== shift[2].building_id) ? `*To ${toTitleCase(shift[2].building)} at ${to12Hour(switchShift.startHour) + ':' + switchShift.startMin}`: undefined
           return [_sshift]
-          break
         default:
-          return 'no matching case'
           break
       }
     })
@@ -135,7 +131,7 @@ const App = () => {
             .map((day, i) => <span className="column-title" id={day.toLowerCase()} style={{ gridRow: 1, gridColumn: i + 2 }}>{day}</span>)}
 
           {timeRowHeaders
-            .map(time => <div className="time-row" id={'time' + time}>{time.match(/\d{1,2}/)[0] + ' ' + time[time.length - 1].toUpperCase() + 'M'}</div>)}
+            .map((time, i) => <div className="time-row" style={{gridRow: i*8+2 + '/ span 8', gridColumn: 1}}>{time.match(/\d{1,2}/)[0] + ' ' + time[time.length - 1].toUpperCase() + 'M'}</div>)}
 
           {shifts &&
             Object.values(shifts)
