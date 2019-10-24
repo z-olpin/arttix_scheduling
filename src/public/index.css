@@ -56,10 +56,10 @@ body {
 }
 
 #schedule {
-  margin: 2rem;
+  margin: 0;
   height: 100%;
   display: grid;
-  padding: 2rem 0;
+  padding: 2rem 0 0 0;
   grid-template-columns: 0.5fr repeat(7, 1fr);
   grid-template-rows: repeat(64, minmax(0.6rem, max-content));
   justify-items: center;
@@ -85,35 +85,6 @@ body {
   padding-bottom: 0.5rem;
   font-weight: bold;
   text-transform: uppercase;
-}
-
-#time8a {
-  grid-column: 1;
-  grid-row: 2 / span 8;
-}
-#time10a {
-  grid-column: 1;
-  grid-row: 10 / span 8;
-}
-#time12p {
-  grid-column: 1;
-  grid-row: 18 / span 8;
-}
-#time2p {
-  grid-column: 1;
-  grid-row: 26 / span 8;
-}
-#time4p {
-  grid-column: 1;
-  grid-row: 34 / span 8;
-}
-#time6p {
-  grid-column: 1;
-  grid-row: 42 / span 8;
-}
-#time8p {
-  grid-column: 1;
-  grid-row: 50 / span 8;
 }
 
 .shift {
