@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { format, startOfWeek, endOfWeek } from "date-fns";
 import '../../public/index.css';
+import { Link, Route, Switch, BrowserRouter} from "react-router-dom";
 
 const App = () => {
   const [user, setUser] = useState()
   const [shifts, setShifts] = useState()
-
   const presentMonday = format(startOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
   const presentSunday = format(endOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
   const weekdayColumnHeaders = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -23,13 +23,21 @@ const App = () => {
     const formData = new FormData();
     const fileField = document.querySelector('input[type="file"]');
     formData.append('file', fileField.files[0]);
-      const response = fetch('http://localhost:5000/uploadFile',
-        {
-          method: 'POST',
-          body: formData
-        }
-      )
-  }
+    fetch('http://localhost:5000/uploadFile',
+      {
+        method: 'POST',
+        body: formData
+      }
+    ).then(r => {
+      if (r.status === 200) {
+        alert('schedule uploaded')
+        history.back()
+      } else {
+        alert('something went wrong')
+        history.back()
+      }
+    }
+  )}
 
   const handleUserChange = e => {
     e.preventDefault()
@@ -117,53 +125,67 @@ const App = () => {
 
   return (
     <>
-        <form onSubmit={fileUpload}>
-          <input id="fileInput" type="file" name="schedule" />
-          <input type="submit" value="Upload a file"/>
-        </form>
-      <nav id="navbar" style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
+      <BrowserRouter>
+        {
+          //  extract this  as component
+        }
+        <nav id="navbar" style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
           <a href="#" id="logo" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
-              <select id="user-input" onChange={handleUserChange}>
-                <option selected>User:</option>
-                <option>Zach</option>
-                <option>Alice</option>
-                <option>Bob</option>
-                <option>Charlie</option>
-                <option>Doug</option>
-              </select>
-      </nav>
-      <div id="container">
-      <div id="week-slider">
-        <button className="week-button">&#8592;</button>
-        <h3 id='week-title'>This week</h3>
-        <button className="week-button">&#8594;</button>
-      </div>
-        <div id="sidebar"></div>
-        <div id="schedule">
-          {[...Array(62).keys()].map(v =>
-            <span style={{ borderTop: (v % 8) ? '0' : '1px solid rgba(0,0,0,0.3)', gridRow: v + 2, gridColumn: '1 / 9', width: '100%' }}></span>
-          )}
+          <Link to='/upload'>Upload Schedule</Link>
+            <div><label htmlFor="user-input">User:</label>
+            <select id="user-input" onChange={handleUserChange}>
+              <option selected></option>
+              <option>Zach</option>
+              <option>Alice</option>
+              <option>Bob</option>
+              <option>Kirkham Douglas</option>
+              <option>Doug</option>
+            </select>
+            </div>
+        </nav>
 
-          {weekdayColumnHeaders
-            .map((day, i) => <span className="column-title" id={day.toLowerCase()} style={{ gridRow: 1, gridColumn: i + 2 }}>{day}</span>)}
-
-          {timeRowHeaders
-            .map((time, i) => <div className="time-row" style={{gridRow: i*8+2 + '/ span 8', gridColumn: 1}}>{time.match(/\d{1,2}/)[0] + ' ' + time[time.length - 1].toUpperCase() + 'M'}</div>)}
-
-          {shifts &&
-            Object.values(shifts)
-            .map(shift =>
-              <div className='shift' style={{ gridArea: defineGridArea(shift) }}>
-                <div>{toTitleCase(shift.building)}</div>
-                <hr></hr>
-                <div style={{display: 'block'}}>{`${to12Hour(shift.startHour)}:${shift.startMin}`} - {`${to12Hour(shift.endHour)}:${shift.endMin}`}</div>
-                <hr></hr>
-                <div style={{display: 'block', position: 'absolute', bottom: 0, left: 0, margin: '1rem', fontStyle: 'italic', fontSize: '1rem'}}>{shift.notes ? `${shift.notes}` : undefined}</div>
+        <Switch>
+          <Route path='/index.html'>
+            <div id="container">
+              <div id="week-slider">
+                <button className="week-button">&#8592;</button>
+                <h3 id='week-title'>This week</h3>
+                <button className="week-button">&#8594;</button>
               </div>
-            )
-          }
-        </div>
-      </div>
+              <div id="schedule">
+                {[...Array(62).keys()].map(v =>
+                  <span style={{ borderTop: (v % 8) ? '0' : '1px solid rgba(0,0,0,0.3)', gridRow: v + 2, gridColumn: '1 / 9', width: '100%' }}></span>
+                )}
+
+                {weekdayColumnHeaders
+                  .map((day, i) => <span className="column-title" id={day.toLowerCase()} style={{ gridRow: 1, gridColumn: i + 2 }}>{day}</span>)}
+
+                {timeRowHeaders
+                  .map((time, i) => <div className="time-row" style={{gridRow: i*8+2 + '/ span 8', gridColumn: 1}}>{time.match(/\d{1,2}/)[0] + ' ' + time[time.length - 1].toUpperCase() + 'M'}</div>)}
+
+                {shifts &&
+                  Object.values(shifts)
+                  .map(shift =>
+                    <div className='shift' style={{ gridArea: defineGridArea(shift) }}>
+                      <div>{toTitleCase(shift.building)}</div>
+                      <hr></hr>
+                      <div style={{display: 'block'}}>{`${to12Hour(shift.startHour)}:${shift.startMin}`} - {`${to12Hour(shift.endHour)}:${shift.endMin}`}</div>
+                      <hr></hr>
+                      <div style={{display: 'block', position: 'absolute', bottom: 0, left: 0, margin: '1rem', fontStyle: 'italic', fontSize: '1rem'}}>{shift.notes ? `${shift.notes}` : undefined}</div>
+                    </div>
+                  )
+                }
+              </div>
+            </div>
+          </Route>
+          <Route path='/upload'>
+            <form onSubmit={fileUpload}>
+              <input id="fileInput" type="file" name="schedule" />
+              <input type="submit" value="Upload a file"/>
+            </form>
+          </Route>
+        </Switch>
+      </BrowserRouter>
     </>
   )
 }
