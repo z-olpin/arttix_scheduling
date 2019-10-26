@@ -1,5 +1,7 @@
 const express = require('express')
 const { Pool} = require('pg')
+const bodyParser = require('body-parser')
+const multer = require('multer');
 require('dotenv').config()
 
 const PORT = process.env.PORT || 5000
@@ -12,8 +14,34 @@ const pool = new Pool({
 })
 
 
+server.use(bodyParser.urlencoded({extended: true}))
 server.use('/dist', express.static('dist'));
 server.use('/index.html', express.static('src/public/index.html'))
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now().toString())
+  }
+})
+ 
+const upload = multer({ storage: storage })
+
+const parse = csv => {
+
+}
+
+server.post('/uploadFile', upload.single('file'), (req, res, next) => {
+  const file = req.file
+  if (!file) {
+    const error = new Error('Please upload a file')
+    error.httpStatusCode = 400
+    return next(error)
+  }
+    res.send(file)
+})
 
 server.get('/', (req, res) => {
   res.redirect('/index.html')

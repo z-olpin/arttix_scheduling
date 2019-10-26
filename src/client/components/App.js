@@ -18,6 +18,19 @@ const App = () => {
       .then(r => setShifts(r))
   }, [user])
 
+  const fileUpload = e => {
+    e.preventDefault();
+    const formData = new FormData();
+    const fileField = document.querySelector('input[type="file"]');
+    formData.append('file', fileField.files[0]);
+      const response = fetch('http://localhost:5000/uploadFile',
+        {
+          method: 'POST',
+          body: formData
+        }
+      )
+  }
+
   const handleUserChange = e => {
     e.preventDefault()
     setUser(e.target.value.slice(0, 1).toLowerCase() + e.target.value.slice(1))
@@ -104,6 +117,10 @@ const App = () => {
 
   return (
     <>
+        <form onSubmit={fileUpload}>
+          <input id="fileInput" type="file" name="schedule" />
+          <input type="submit" value="Upload a file"/>
+        </form>
       <nav id="navbar" style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
           <a href="#" id="logo" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
               <select id="user-input" onChange={handleUserChange}>
