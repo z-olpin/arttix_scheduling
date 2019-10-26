@@ -1,40 +1,48 @@
 html {
   background: rgb(223, 211, 204);
   font-family: helvetica, arial, sans-serif;
-  height: 100%;
-  width: 100%;
 }
 body {
-  height: 100%;
-  width: 100%;
+  margin: 0;
 }
 
-#app {
-  height: 100%;
-  width: 100%;
+
+#navbar > * {
+  color: white;
+  font-size: 1rem;
+  margin: 1rem 1.5rem;
+  text-decoration: none;
+}
+#navbar > a:hover, #logo:hover{
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 #logo {
-  font-size: 2rem;
+  font-size: 2.2rem;
 }
 
-#user-input {
-  display: inline-block;
-  position: absolute;
-  right: 1rem;
-  width: max-content;
-  top: 0.5rem;
+select {
+  appearance: none;
+  font-size: 1.2rem;
+  padding: 2rem;
+  outline: 0;
+  box-shadow: none;
+  border: 0;
+  background-image: none;
+  margin: 1rem 1.5rem;
 }
-
 #navbar {
-  margin-bottom: 0 !important;
+  display: flex;
+  height: auto;
+  margin-bottom: 0;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .week-button {
   background: transparent;
-  flex-grow: 1;
   font-size: 4rem;
-  color: #000;
   border: 0;
 }
 
@@ -48,10 +56,10 @@ body {
 }
 
 #week-slider {
+  font-size: 2rem;
   display: flex;
   grid-row: 1;
   grid-column: 1 / span 2;
-  margin: 2rem;
   justify-content: space-around;
 }
 
@@ -64,21 +72,6 @@ body {
   grid-template-rows: repeat(64, minmax(0.6rem, max-content));
   justify-items: center;
   border-top: 0.3rem solid black;
-}
-
-#container {
-  margin: 0;
-  display: grid;
-  height: 100%;
-  grid-template-columns: 1fr 11fr;
-  grid-template-rows: max-content 1fr;
-}
-
-#sidebar {
-  background: rgb(180, 148, 148);
-  grid-area: 1 / 1 / 3 / 1;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 }
 
 .column-title {
