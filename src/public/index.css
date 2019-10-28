@@ -6,6 +6,9 @@ body {
   margin: 0;
 }
 
+main {
+  margin: 1.5rem;
+}
 
 #navbar > * {
   color: white;
@@ -22,7 +25,7 @@ body {
   font-size: 2.2rem;
 }
 
-select {
+#user-input {
   appearance: none;
   font-size: 1.2rem;
   padding: 2rem;
@@ -32,6 +35,20 @@ select {
   background-image: none;
   margin: 1rem 1.5rem;
 }
+
+table {
+  font-size: 1.2rem;
+  width: 100%;
+  border-spacing: 0.3rem;
+  text-align: left;
+}
+
+
+select {
+ font-size: 1rem;
+ max-width: min-content;
+}
+
 #navbar {
   display: flex;
   height: auto;
@@ -89,4 +106,8 @@ select {
   font-size: 1.2rem;
   text-align: center;
   position: relative;
+}
+
+#file-upload {
+  margin: 2rem;
 }

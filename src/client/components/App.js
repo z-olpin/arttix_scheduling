@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { format, startOfWeek, endOfWeek } from "date-fns";
 import '../../public/index.css';
-import { Link, Route, Switch, BrowserRouter} from "react-router-dom";
+import { Link, Route, Switch, BrowserRouter } from "react-router-dom";
 
 const App = () => {
   const [user, setUser] = useState()
   const [shifts, setShifts] = useState()
+  const [newSchedule, setNewSchedule] = useState()
+  // TODO: presentMonday and presentSunday for implementing the week slider. Establishes date range of current week
   const presentMonday = format(startOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
   const presentSunday = format(endOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
   const weekdayColumnHeaders = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const timeRowHeaders = ['8a', '10a', '12p', '2p', '4p', '6p', '8p']
+  const buildings = ['Abravanel', 'Capitol', 'Delta', 'RSBB', 'Rose Wagner']
+  const employees = ['Zach', 'Alice', 'Bob', 'Charlie', 'Douglas']
 
+  // Get user's shifts
   useEffect(() => {
     fetch(`http://localhost:5000/employees/${user}/shifts`, { method: 'GET' })
       .then(r => r.json())
@@ -18,26 +23,19 @@ const App = () => {
       .then(r => setShifts(r))
   }, [user])
 
+  // Post uploaded schedule csv to server
   const fileUpload = e => {
     e.preventDefault();
     const formData = new FormData();
     const fileField = document.querySelector('input[type="file"]');
     formData.append('file', fileField.files[0]);
-    fetch('http://localhost:5000/uploadFile',
-      {
-        method: 'POST',
-        body: formData
-      }
-    ).then(r => {
-      if (r.status === 200) {
-        alert('schedule uploaded')
-        history.back()
-      } else {
-        alert('something went wrong')
-        history.back()
-      }
-    }
-  )}
+    fetch('http://localhost:5000/uploadFile', { method: 'POST', body: formData })
+      .then(r => r.json())
+      .then(r => {
+        setNewSchedule(r)
+      debugger
+    })
+  }
 
   const handleUserChange = e => {
     e.preventDefault()
@@ -57,6 +55,7 @@ const App = () => {
     }
   }
 
+  // TODO: Fix this mess. Returns an object with each shift
   const formatShifts = (rows) => {
     let _rows = rows.map(shift => {
       const _shift = { ...shift }
@@ -115,6 +114,7 @@ const App = () => {
     return newObj
   }
 
+  // Position a shift div in the schedule grid
   const defineGridArea = shift => {
     const rowStart = (parseInt(shift.startHour) - 8) * 4 + (parseInt(shift.startMin) / 15) + 2
     const columnStart = parseInt(shift.dow) + 1
@@ -126,65 +126,96 @@ const App = () => {
   return (
     <>
       <BrowserRouter>
-        {
-          //  extract this  as component
-        }
         <nav id="navbar" style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
-          <a href="#" id="logo" style={{ marginLeft: '1.5rem' }}>zchedul_</a>
+          <Link to="/index.html" id="logo" style={{ marginLeft: '1.5rem' }}>zchedul_</Link>
           <Link to='/upload'>Upload Schedule</Link>
+          <Link to='/create'>Create</Link>
+
             <div><label htmlFor="user-input">User:</label>
             <select id="user-input" onChange={handleUserChange}>
               <option selected></option>
-              <option>Zach</option>
-              <option>Alice</option>
-              <option>Bob</option>
-              <option>Kirkham Douglas</option>
-              <option>Doug</option>
+              {employees.map(e => <option>{e}</option>)}
             </select>
             </div>
         </nav>
-
-        <Switch>
-          <Route path='/index.html'>
-            <div id="container">
-              <div id="week-slider">
-                <button className="week-button">&#8592;</button>
-                <h3 id='week-title'>This week</h3>
-                <button className="week-button">&#8594;</button>
+        <main>
+          <Switch>
+            <Route path='/index.html'>
+              <div id="container">
+                <div id="week-slider">
+                  <button className="week-button">&#8592;</button>
+                  <h3 id='week-title'>This week</h3>
+                  <button className="week-button">&#8594;</button>
+                </div>
+                <div id="schedule">
+                  {/* TODO: This draws the horizontal lines. But no need to make a 62 spans, just make one for each line */}
+                  {[...Array(62).keys()].map(v =>
+                    <span style={{ borderTop: (v % 8) ? '0' : '1px solid rgba(0,0,0,0.3)', gridRow: v + 2, gridColumn: '1 / 9', width: '100%' }}></span>
+                  )}
+                  {weekdayColumnHeaders
+                    .map((day, i) =>
+                      <span className="column-title" id={day.toLowerCase()} style={{ gridRow: 1, gridColumn: i + 2 }}>
+                        {day}
+                      </span>
+                    )
+                  }
+                  {timeRowHeaders
+                    .map((time, i) =>
+                      <div className="time-row" style={{gridRow: i*8+2 + '/ span 8', gridColumn: 1}}>
+                        {time.match(/\d{1,2}/)[0] + ' ' + time[time.length - 1].toUpperCase() + 'M'}
+                      </div>
+                    )
+                  }
+                  {shifts &&
+                    Object.values(shifts)
+                    .map(shift =>
+                      <div className='shift' style={{ gridArea: defineGridArea(shift) }}>
+                        <div>{toTitleCase(shift.building)}</div>
+                        <hr></hr>
+                        <div style={{display: 'block'}}>{`${to12Hour(shift.startHour)}:${shift.startMin}`} - {`${to12Hour(shift.endHour)}:${shift.endMin}`}</div>
+                        <hr></hr>
+                        <div style={{display: 'block', position: 'absolute', bottom: 0, left: 0, margin: '1rem', fontStyle: 'italic', fontSize: '1rem'}}>{shift.notes ? `${shift.notes}` : undefined}</div>
+                      </div>
+                    )
+                  }
+                </div>
               </div>
-              <div id="schedule">
-                {[...Array(62).keys()].map(v =>
-                  <span style={{ borderTop: (v % 8) ? '0' : '1px solid rgba(0,0,0,0.3)', gridRow: v + 2, gridColumn: '1 / 9', width: '100%' }}></span>
-                )}
-
-                {weekdayColumnHeaders
-                  .map((day, i) => <span className="column-title" id={day.toLowerCase()} style={{ gridRow: 1, gridColumn: i + 2 }}>{day}</span>)}
-
-                {timeRowHeaders
-                  .map((time, i) => <div className="time-row" style={{gridRow: i*8+2 + '/ span 8', gridColumn: 1}}>{time.match(/\d{1,2}/)[0] + ' ' + time[time.length - 1].toUpperCase() + 'M'}</div>)}
-
-                {shifts &&
-                  Object.values(shifts)
-                  .map(shift =>
-                    <div className='shift' style={{ gridArea: defineGridArea(shift) }}>
-                      <div>{toTitleCase(shift.building)}</div>
-                      <hr></hr>
-                      <div style={{display: 'block'}}>{`${to12Hour(shift.startHour)}:${shift.startMin}`} - {`${to12Hour(shift.endHour)}:${shift.endMin}`}</div>
-                      <hr></hr>
-                      <div style={{display: 'block', position: 'absolute', bottom: 0, left: 0, margin: '1rem', fontStyle: 'italic', fontSize: '1rem'}}>{shift.notes ? `${shift.notes}` : undefined}</div>
-                    </div>
-                  )
-                }
-              </div>
-            </div>
-          </Route>
-          <Route path='/upload'>
-            <form onSubmit={fileUpload}>
-              <input id="fileInput" type="file" name="schedule" />
-              <input type="submit" value="Upload a file"/>
-            </form>
-          </Route>
-        </Switch>
+            </Route>
+            <Route path='/upload'>
+              <form id="file-upload" name="file-upload" onSubmit={fileUpload}>
+              <label htmlFor='file-upload'>Upload a new schedule: </label>
+                <input id="fileInput" type="file" name="file" />
+                <input type="submit" value="Upload"/>
+              </form>
+              {newSchedule &&
+                <table style={{fontSize: '0.8rem', width: 'auto'}}>{newSchedule.map(row => <tr>{row.map(r => <td>{r}</td>)}</tr>)}</table>
+              }
+              
+            </Route>
+            <Route path='/create'>
+              <table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    {weekdayColumnHeaders.map(day => <th>{day}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {buildings.map(b => 
+                    <tr>
+                      <th>{b}</th>
+                      {weekdayColumnHeaders.map(_ => 
+                        <td>
+                          <select><option selected>Employee</option>{employees.map(emp => <option>{emp}</option>)}</select>
+                        </td>
+                      )}
+                    </tr>
+                  )}
+                  </tbody>
+              </table>
+            </Route>
+          </Switch>
+        </main>
       </BrowserRouter>
     </>
   )
