@@ -20,8 +20,8 @@ server.use('/index.html', express.static('src/public/index.html'))
 // Handler for uploaded schedules
 server.post('/uploadFile', upload.single('file'), (req, res) => {
   // TODO: Post to database
-  const l = req.file.buffer.toString()
-  res.json(l)
+  const csvStr = req.file.buffer.toString()
+  res.json(csvStr)
 })
 
 server.get('/', (_req, res) => {
