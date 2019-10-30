@@ -31,12 +31,9 @@ const App = () => {
     formData.append('file', fileField.files[0]);
     fetch('http://localhost:5000/uploadFile', { method: 'POST', body: formData })
       .then(r => r.json())
-      .then(r => {
-        // r is a single string of csv
-        let rows = r.split('\n')
-          .map(rowStr => rowStr.replace(/"([\w\,\s]*)"/g, (_match, p1) => p1.replace(",", "")).split(",").map(ent => ent.trim()))
-        return rows
-      })
+      .then(r => r.split(/[\n\r]/) // *nix uses \n and windows uses \r
+        .map(rowStr => rowStr.replace(/"([\w\,\s]*)"/g, (_match, p1) => p1.replace(",", ""))
+          .split(",").map(ent => ent.trim().toLowerCase())))
       .then(r => setNewSchedule(r))
   }
 
@@ -134,7 +131,7 @@ const App = () => {
           <Link to='/create'>Create</Link>
           <Link to="/index.html">View</Link>
 
-            <div><label htmlFor="user-input">User:</label>
+            <div><label htmlFor="user-input" style={{marginRight: '1rem'}}>User:</label>
             <select id="user-input" onChange={handleUserChange}>
               <option selected></option>
               {employees.map(e => <option>{e}</option>)}
