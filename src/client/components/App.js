@@ -32,9 +32,12 @@ const App = () => {
     fetch('http://localhost:5000/uploadFile', { method: 'POST', body: formData })
       .then(r => r.json())
       .then(r => {
-        setNewSchedule(r)
-      debugger
-    })
+        // r is a single string of csv
+        let rows = r.split('\n')
+          .map(rowStr => rowStr.replace(/"([\w\,\s]*)"/g, (_match, p1) => p1.replace(",", "")).split(",").map(ent => ent.trim()))
+        return rows
+      })
+      .then(r => setNewSchedule(r))
   }
 
   const handleUserChange = e => {
@@ -83,7 +86,6 @@ const App = () => {
       switch(shift.length) {
         case 1:
           return shift
-          break
         case 2:
           if (shift[1].comparisonStart < shift[0].comparisonEnd) {
             let _shift = {...shift[0]}
@@ -128,8 +130,9 @@ const App = () => {
       <BrowserRouter>
         <nav id="navbar" style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
           <Link to="/index.html" id="logo" style={{ marginLeft: '1.5rem' }}>zchedul_</Link>
-          <Link to='/upload'>Upload Schedule</Link>
+          <Link to='/upload'>Upload</Link>
           <Link to='/create'>Create</Link>
+          <Link to="/index.html">View</Link>
 
             <div><label htmlFor="user-input">User:</label>
             <select id="user-input" onChange={handleUserChange}>
@@ -188,7 +191,16 @@ const App = () => {
                 <input type="submit" value="Upload"/>
               </form>
               {newSchedule &&
-                <table style={{fontSize: '0.8rem', width: 'auto'}}>{newSchedule.map(row => <tr>{row.map(r => <td>{r}</td>)}</tr>)}</table>
+                <table className="new-sched">
+                  <thead>
+                    <tr>
+                      {[...Array(22)].fill('COL').map(n => <th>{n}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody className="new-sched">
+                    {newSchedule.map(row => <tr className="new-sched">{row.map(ent => <td>{ent}</td>)}</tr>)}
+                  </tbody>
+                </table>
               }
               
             </Route>

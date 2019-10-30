@@ -36,11 +36,8 @@ main {
   margin: 1rem 1.5rem;
 }
 
-table {
-  font-size: 1.2rem;
-  width: 100%;
-  border-spacing: 0.3rem;
-  text-align: left;
+table, tr, td {
+  border: 1px solid black;
 }
 
 
