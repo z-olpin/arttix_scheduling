@@ -17,33 +17,53 @@ server.use('/dist', express.static('dist'));
 server.use('/uploads', express.static('uploads'));
 server.use('/index.html', express.static('src/public/index.html'))
 
-// Handler for uploaded schedules
-server.post('/uploadFile', upload.single('file'), (req, res) => {
-  // TODO: Post to database
-  const csvStr = req.file.buffer.toString()
-  res.json(csvStr)
-})
-
 server.get('/', (_req, res) => {
   res.redirect('/index.html')
 })
 
+// Handler for uploaded schedules
+server.post('/uploadFile', upload.single('file'), (req, res) => {
+  if (req.file.mimetype === 'text/csv') {
+    // Single string representation of CSV
+    const csvStr = req.file.buffer.toString()
+
+    // Makes 2D array representation of csv, with each inner array representing a row
+    let csvRows = csvStr.split(/[\n\r]+/)
+      .map(rowStr => rowStr.replace(/"([\w\,\s]*)"/g, (_match, p1) => p1.replace(",", "")) 
+        .split(",").map(ent => ent.trim().toLowerCase()))
+    // Returns rows with row[0] === the correct building name
+      .reduce((acc,curr,ind) => (curr[0] != '')
+        ? acc.concat([curr])
+        : acc.concat([[acc[ind-1][0], ...curr.slice(1)]]), [])
+      .map(row => row.slice(0, 22))
+
+    res.json(csvRows)
+  } else {
+    res.status(400).send('File must be CSV')
+  }
+})
+
+// Get all employee names
+server.get('/employees', async (_req, res) => {
+  const result = await pool.query('SELECT employees.name FROM employees ORDER BY employees.name DESC')
+  res.json(result.rows)
+})
+
 server.get('/employees/:name/shifts', async (req, res) => {
 
-  let result = await pool.query('\
-    select\
-      shifts.shift_id::integer,\
+  const result = await pool.query('\
+    SELECT\
       shifts.start,\
       shifts.end,\
       shifts.building_id,\
-      buildings.name as building,\
+      buildings.name AS building,\
       employees.name\
-    from shifts, employees, buildings\
-    where\
-      employees.name=$1 and\
-      shifts.employee_id=employees.employee_id and\
+    FROM shifts, employees, buildings\
+    WHERE\
+      employees.name=$1 AND\
+      shifts.employee_id=employees.employee_id AND\
       shifts.building_id=buildings.building_id\
-    order by shifts.start asc\
+    ORDER BY shifts.start ASC\
   ', [req.params.name])
   res.json(result.rows)
 })

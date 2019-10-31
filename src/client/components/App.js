@@ -12,28 +12,31 @@ const App = () => {
   const presentSunday = format(endOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
   const weekdayColumnHeaders = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const timeRowHeaders = ['8a', '10a', '12p', '2p', '4p', '6p', '8p']
-  const buildings = ['Abravanel', 'Capitol', 'Delta', 'RSBB', 'Rose Wagner']
-  const employees = ['Zach', 'Alice', 'Bob', 'Charlie', 'Douglas']
+  const buildings = ['Abravanel', 'Capitol', 'Delta Hall', 'Regent Street', 'Rose Wagner']
+  const [employees, setEmployees] = useState([])
+
+  // Get employee names
+  useEffect(() => {
+    fetch('http://localhost:5000/employees', {method: 'GET'})
+      .then(r => r.json())
+      .then(r => setEmployees(r.map(empObj => toTitleCase(empObj.name))))
+  }, [])
 
   // Get user's shifts
   useEffect(() => {
     fetch(`http://localhost:5000/employees/${user}/shifts`, { method: 'GET' })
       .then(r => r.json())
-      .then(rows => formatShifts(rows))
-      .then(r => setShifts(r))
+      .then(rows => setShifts(formatShifts(rows)))
   }, [user])
 
   // Post uploaded schedule csv to server
   const fileUpload = e => {
     e.preventDefault();
     const formData = new FormData();
-    const fileField = document.querySelector('input[type="file"]');
-    formData.append('file', fileField.files[0]);
+    const fileField = document.querySelector('input[type="file"]')
+    formData.append('file', fileField.files[0])
     fetch('http://localhost:5000/uploadFile', { method: 'POST', body: formData })
       .then(r => r.json())
-      .then(r => r.split(/[\n\r]/) // *nix uses \n and windows uses \r
-        .map(rowStr => rowStr.replace(/"([\w\,\s]*)"/g, (_match, p1) => p1.replace(",", ""))
-          .split(",").map(ent => ent.trim().toLowerCase())))
       .then(r => setNewSchedule(r))
   }
 
@@ -126,16 +129,16 @@ const App = () => {
     <>
       <BrowserRouter>
         <nav id="navbar" style={{ marginBottom: '1rem', backgroundColor: '#41433A' }}>
-          <Link to="/index.html" id="logo" style={{ marginLeft: '1.5rem' }}>zchedul_</Link>
+          <Link to="/index.html" id="logo" style={{ marginLeft: '1.5rem' }}>	&#927;	&#927;	&#927;	&#927;	&#927;	&#927;	&#927;</Link>
           <Link to='/upload'>Upload</Link>
           <Link to='/create'>Create</Link>
           <Link to="/index.html">View</Link>
-
-            <div><label htmlFor="user-input" style={{marginRight: '1rem'}}>User:</label>
-            <select id="user-input" onChange={handleUserChange}>
-              <option selected></option>
-              {employees.map(e => <option>{e}</option>)}
-            </select>
+            <div>
+              <label htmlFor="user-input" style={{marginRight: '1rem'}}>User:</label>
+              <select id="user-input" onChange={handleUserChange}>
+                <option selected></option>
+                {employees.map(e => <option>{e}</option>)}
+              </select>
             </div>
         </nav>
         <main>
@@ -171,9 +174,9 @@ const App = () => {
                     .map(shift =>
                       <div className='shift' style={{ gridArea: defineGridArea(shift) }}>
                         <div>{toTitleCase(shift.building)}</div>
-                        <hr></hr>
+                        <hr/>
                         <div style={{display: 'block'}}>{`${to12Hour(shift.startHour)}:${shift.startMin}`} - {`${to12Hour(shift.endHour)}:${shift.endMin}`}</div>
-                        <hr></hr>
+                        <hr/>
                         <div style={{display: 'block', position: 'absolute', bottom: 0, left: 0, margin: '1rem', fontStyle: 'italic', fontSize: '1rem'}}>{shift.notes ? `${shift.notes}` : undefined}</div>
                       </div>
                     )
@@ -183,23 +186,17 @@ const App = () => {
             </Route>
             <Route path='/upload'>
               <form id="file-upload" name="file-upload" onSubmit={fileUpload}>
-              <label htmlFor='file-upload'>Upload a new schedule: </label>
+                <label htmlFor='file-upload'>Upload a new schedule (.csv): </label>
                 <input id="fileInput" type="file" name="file" />
                 <input type="submit" value="Upload"/>
               </form>
               {newSchedule &&
-                <table className="new-sched">
-                  <thead>
-                    <tr>
-                      {[...Array(22)].fill('COL').map(n => <th>{n}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody className="new-sched">
-                    {newSchedule.map(row => <tr className="new-sched">{row.map(ent => <td>{ent}</td>)}</tr>)}
+                <table>
+                  <tbody>
+                    {newSchedule.map(row => <tr>{row.map(ent => <td>{ent}</td>)}</tr>)}
                   </tbody>
                 </table>
               }
-              
             </Route>
             <Route path='/create'>
               <table>
@@ -215,7 +212,14 @@ const App = () => {
                       <th>{b}</th>
                       {weekdayColumnHeaders.map(_ => 
                         <td>
-                          <select><option selected>Employee</option>{employees.map(emp => <option>{emp}</option>)}</select>
+                          <div>
+                            <select>
+                              <option selected>Employee</option>
+                              {employees.map(emp => <option>{emp}</option>)}
+                            </select>
+                            <input></input>
+                            <input></input>
+                          </div>
                         </td>
                       )}
                     </tr>
