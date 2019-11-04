@@ -11,7 +11,6 @@ import CreateSchedule from './pages/CreateSchedule'
 const App = () => {
   const [user, setUser] = useState()
   const [shifts, setShifts] = useState()
-  const [newSchedule, setNewSchedule] = useState()
   // TODO: presentMonday and presentSunday for implementing the week slider. Establishes date range of current week
   const presentMonday = format(startOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
   const presentSunday = format(endOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
@@ -24,7 +23,7 @@ const App = () => {
   useEffect(() => {
     fetch('http://localhost:5000/employees', {method: 'GET'})
       .then(r => r.json())
-      .then(r => setEmployees(r.map(empObj => toTitleCase(empObj.name))))
+      .then(r => setEmployees(r.map(empObj => empObj.name)))
   }, [])
 
   // Get user's shifts
@@ -34,20 +33,9 @@ const App = () => {
       .then(rows => setShifts(formatShifts(rows)))
   }, [user])
 
-  // Post uploaded schedule csv to server
-  const fileUpload = e => {
-    e.preventDefault();
-    const formData = new FormData();
-    const fileField = document.querySelector('input[type="file"]')
-    formData.append('file', fileField.files[0])
-    fetch('http://localhost:5000/uploadFile', { method: 'POST', body: formData })
-      .then(r => r.json())
-      .then(r => setNewSchedule(r))
-  }
-
   const handleUserChange = e => {
     e.preventDefault()
-    setUser(e.target.value.slice(0, 1).toLowerCase() + e.target.value.slice(1))
+    setUser(e.target.value)
   }
 
   return (
@@ -60,7 +48,7 @@ const App = () => {
               <ViewSchedule shifts={shifts} weekdayColumnHeaders={weekdayColumnHeaders} timeRowHeaders={timeRowHeaders}/>
             </Route>
             <Route path='/upload'>
-              <UploadSchedule fileUpload={fileUpload} newSchedule={newSchedule}/>
+              <UploadSchedule />
             </Route>
             <Route path='/create'>
               <CreateSchedule weekdayColumnHeaders={weekdayColumnHeaders} employees={employees} buildings={buildings}/>

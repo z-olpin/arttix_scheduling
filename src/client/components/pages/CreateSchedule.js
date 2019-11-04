@@ -1,4 +1,5 @@
 import React from "react"
+import { toTitleCase } from "../../utils/utils";
 
 const CreateSchedule = ({weekdayColumnHeaders, buildings, employees}) => {
 
@@ -20,7 +21,7 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees}) => {
                   <div>
                     <select>
                       <option selected>Employee</option>
-                      {employees.map(emp => <option>{emp}</option>)}
+                      {employees.map(emp => <option value={emp}>{toTitleCase(emp)}</option>)}
                     </select>
                     <input></input>
                     <input></input>

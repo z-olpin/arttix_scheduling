@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { toTitleCase } from "../../utils/utils";
 
 const Header = ({handleUserChange, employees}) => {
 
@@ -13,7 +14,7 @@ const Header = ({handleUserChange, employees}) => {
         <label htmlFor="user-input" style={{marginRight: '1rem'}}>User:</label>
         <select id="user-input" onChange={handleUserChange}>
           <option selected></option>
-          {employees.map(e => <option>{e}</option>)}
+          {employees.map(e => <option value={e}>{toTitleCase(e)}</option>)}
         </select>
       </div>
     </nav>
