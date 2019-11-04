@@ -1,9 +1,11 @@
 const express = require('express')
 const {Pool} = require('pg')
 const multer = require('multer')
+import { parseCsv, fillRowHeaders, convertTo24Hour } from "./utils/utils";
 require('dotenv').config()
 
 const PORT = process.env.PORT || 5000
+
 const server = express();
 
 const pool = new Pool({
@@ -17,27 +19,29 @@ server.use('/dist', express.static('dist'));
 server.use('/uploads', express.static('uploads'));
 server.use('/index.html', express.static('src/public/index.html'))
 
+// If no endpoint, redirect
 server.get('/', (_req, res) => {
   res.redirect('/index.html')
 })
 
 // Handler for uploaded schedules
-server.post('/uploadFile', upload.single('file'), (req, res) => {
+server.post('/uploadFile', upload.single('file'), async (req, res) => {
+
+  const result = await pool.query('SELECT employees.name FROM employees ORDER BY employees.name DESC')
+  const employees = result.rows.map(obj => obj.name)
+
   if (req.file.mimetype === 'text/csv') {
-    // Single string representation of CSV
-    const csvStr = req.file.buffer.toString()
+    const csvString = req.file.buffer.toString()  // Single string representation of CSV
+    const parsed = parseCsv(csvString) // Makes 2D array representation of csv, with each inner array representing a row
+    const filled = fillRowHeaders(parsed)
+    const amPm = convertTo24Hour(filled) // Fills blank first indices in each row with building name
+    res.json(amPm)
 
-    // Makes 2D array representation of csv, with each inner array representing a row
-    let csvRows = csvStr.split(/[\n\r]+/)
-      .map(rowStr => rowStr.replace(/"([\w\,\s]*)"/g, (_match, p1) => p1.replace(",", "")) 
-        .split(",").map(ent => ent.trim().toLowerCase()))
-    // Returns rows with row[0] === the correct building name
-      .reduce((acc,curr,ind) => (curr[0] != '')
-        ? acc.concat([curr])
-        : acc.concat([[acc[ind-1][0], ...curr.slice(1)]]), [])
-      .map(row => row.slice(0, 22))
+    // TODO: Sort out shifts, check each name against employees list. If no match, find closest relative using
+    // Levenshtein ratio. Assume 4 hour shift.
+    // Date column can be transformed with dfns.format(dfns.parse('COLUMN HEADER, 'EEEE MMMM d', new Date()), 'yyyy-MM-dd HH:mm')
 
-    res.json(csvRows)
+
   } else {
     res.status(400).send('File must be CSV')
   }
@@ -49,6 +53,7 @@ server.get('/employees', async (_req, res) => {
   res.json(result.rows)
 })
 
+// Get all shifts for an employee by name
 server.get('/employees/:name/shifts', async (req, res) => {
 
   const result = await pool.query('\
