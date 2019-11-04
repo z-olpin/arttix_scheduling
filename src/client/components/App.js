@@ -12,8 +12,8 @@ const App = () => {
   const [user, setUser] = useState()
   const [shifts, setShifts] = useState()
   // TODO: presentMonday and presentSunday for implementing the week slider. Establishes date range of current week
-  const presentMonday = format(startOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
-  const presentSunday = format(endOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyyMMdd')
+  const presentMonday = format(startOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyy/MM/dd')
+  const presentSunday = format(endOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyy/MM/dd')
   const [employees, setEmployees] = useState([])
   const weekdayColumnHeaders = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const buildings = ['Abravanel', 'Capitol', 'Delta Hall', 'Regent Street', 'Rose Wagner']

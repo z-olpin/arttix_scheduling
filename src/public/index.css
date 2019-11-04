@@ -29,8 +29,9 @@ table, td, th, tr {
   border: 1px solid black;
   border-collapse: collapse;
   padding: 0.2rem;
+  text-align: left;
+  vertical-align: bottom;
 }
-
 
 select {
  font-size: 1rem;
