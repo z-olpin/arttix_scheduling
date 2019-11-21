@@ -1,7 +1,7 @@
 const express = require('express')
 const {Pool} = require('pg')
 const multer = require('multer')
-import { parseCsv, fillRowHeaders, convertTo24Hour } from "./utils/utils";
+const { parseCsv, fillRowHeaders, convertTo24Hour, dateHeadersToISO } = require('./utils/utils')
 require('dotenv').config()
 
 const PORT = process.env.PORT || 5000
@@ -33,13 +33,13 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
   if (req.file.mimetype === 'text/csv') {
     const csvString = req.file.buffer.toString()  // Single string representation of CSV
     const parsed = parseCsv(csvString) // Makes 2D array representation of csv, with each inner array representing a row
-    const filled = fillRowHeaders(parsed)
+    const formattedDates = dateHeadersToISO(parsed)
+    const filled = fillRowHeaders(formattedDates)
     const amPm = convertTo24Hour(filled) // Fills blank first indices in each row with building name
     res.json(amPm)
 
     // TODO: Sort out shifts, check each name against employees list. If no match, find closest relative using
     // Levenshtein ratio. Assume 4 hour shift.
-    // Date column can be transformed with dfns.format(dfns.parse('COLUMN HEADER, 'EEEE MMMM d', new Date()), 'yyyy-MM-dd HH:mm')
 
 
   } else {
