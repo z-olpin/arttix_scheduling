@@ -55,16 +55,29 @@ module.exports.dateHeadersToISO = parsedCsv => {
     }).reduce((a,c,i) => (c === '') ? [...a, a[i-1]] : [...a, c] , [])
     return _dateRow
   }
-
-  let firstDayofWeek = dfns.parse(parsedCsv[0][1], 'EEEE MMMM d', new Date())
   
-  let _parsedCSV = parsedCsv.map(row => {
+  return parsedCsv.map(row => {
     if (row[0] !== '') {
       return formatDates(row)
     } else {
       return row
     }
   })
+}
 
-  return _parsedCSV
+module.exports.makeShiftObjs = parsedCsv => {
+  let shifts = []
+  for (let row = 0; row < parsedCsv.length ; row++) {
+    for (let cell = 0; cell < parsedCsv[row].length; cell++) {
+      if (typeof parsedCsv[row][cell] === 'string' && parsedCsv[row][cell].match(/^\d+:\d\d(am|pm)$/)) {
+        shifts.push({
+          employeeName: parsedCsv[row][cell - 1],
+          startTime: dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell]),
+          building: parsedCsv[row][0],
+          date: parsedCsv[0][cell]
+        })
+      }
+    }
+  }
+  return shifts
 }
