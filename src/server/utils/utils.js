@@ -7,6 +7,7 @@ module.exports.parseCsv = csvString => {
 }
 
 module.exports.fillRowHeaders = parsedCsv => {
+  // Fill in blank Row headers with building
   return parsedCsv
     .reduce((acc,curr,ind) => (curr[0] != '')
       ? acc.concat([curr])
@@ -16,6 +17,8 @@ module.exports.fillRowHeaders = parsedCsv => {
 
 module.exports.convertTo24Hour = parsedCsv => {
 
+  // Find cells with times (9:45) and figure out whether they are meant to be AM or PM
+  // by looking one column left and up until necessary.
   const getAmPm = (csv, rowNum, colNum) => {
     let _csv = [...csv]
     let _rowNum = rowNum - 1
@@ -29,6 +32,7 @@ module.exports.convertTo24Hour = parsedCsv => {
 
   let _parsedCsv = [...parsedCsv]
 
+  // append am or pm to times
   for (let row = 0; row < _parsedCsv.length; row++) {
     for (let column = 2; column < _parsedCsv[row].length; column += 3)  {
       if (typeof _parsedCsv[row][column] === 'string' && _parsedCsv[row][column].match(/\d+:\d\d/)) {
@@ -39,19 +43,20 @@ module.exports.convertTo24Hour = parsedCsv => {
   return _parsedCsv
 }
 
-// Get date of first cell containing date (A2)
 module.exports.dateHeadersToISO = parsedCsv => {
-
+  // Make sure not and Invalid Date Date Object
   const isValidDate = date => (date instanceof Date && !isNaN(date)) ? true : false
 
+  // Make ISO timestamps. 'monday august 9' year, hour, etc filled in with values from new Date() (now)
   const formatDates = dateRow =>  {
     let _dateRow = dateRow.map(cell => {
-      let _cell = dfns.parse(cell, 'EEEE MMMM d', new Date())
+      let _cell = dfns.parse(cell, 'EEEE MMMM d', new Date()) // EEEE MMMM d: day, month, day-of-month
       if (isValidDate(_cell)) {
         return _cell
       } else {
         return cell
       }
+    // Fill in blank column headers with appropriate dates
     }).reduce((a,c,i) => (c === '') ? [...a, a[i-1]] : [...a, c] , [])
     return _dateRow
   }
@@ -66,6 +71,9 @@ module.exports.dateHeadersToISO = parsedCsv => {
 }
 
 module.exports.makeShiftObjs = parsedCsv => {
+  // Look through cells for times (9:45am) and make an object from them using
+  // row header (buildingName), column header + cell (startTime), column header (date), and
+  // previous cell (employee name)
   let shifts = []
   for (let row = 0; row < parsedCsv.length ; row++) {
     for (let cell = 0; cell < parsedCsv[row].length; cell++) {
