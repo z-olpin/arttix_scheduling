@@ -47,10 +47,17 @@ module.exports.dateHeadersToISO = parsedCsv => {
   // Make sure not and Invalid Date Date Object
   const isValidDate = date => (date instanceof Date && !isNaN(date)) ? true : false
 
-  // Make ISO timestamps. 'monday august 9' year, hour, etc filled in with values from new Date() (now)
+  // Make ISO timestamps. 'monday august 9' year, hour, etc filled in with values from firstDayOfSchedule
   const formatDates = dateRow =>  {
+    const startOfPresentWeek = dfns.startOfWeek(new Date(), {weekStartsOn: 1})
+    const startOfNextWeek = dfns.addWeeks(startOfPresentWeek, 1)
+    let firstDayOfSchedule = dfns.parse(dateRow[1], 'EEEE MMMM d', startOfNextWeek)
+    if (firstDayOfSchedule < startOfNextWeek) {
+      // In case new schedule is for two weeks out in new year (firstDayOfSchedule will be one year behind.)
+      firstDayOfSchedule = dfns.addYears(firstDayOfSchedule, 1)
+    }
     let _dateRow = dateRow.map(cell => {
-      let _cell = dfns.parse(cell, 'EEEE MMMM d', new Date()) // EEEE MMMM d: day, month, day-of-month
+      let _cell = dfns.parse(cell, 'EEEE MMMM d', firstDayOfSchedule) // EEEE MMMM d: day, month, day-of-month
       if (isValidDate(_cell)) {
         return _cell
       } else {
@@ -80,9 +87,9 @@ module.exports.makeShiftObjs = parsedCsv => {
       if (typeof parsedCsv[row][cell] === 'string' && parsedCsv[row][cell].match(/^\d+:\d\d(am|pm)$/)) {
         shifts.push({
           employeeName: parsedCsv[row][cell - 1],
-          startTime: dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell]),
           building: parsedCsv[row][0],
-          date: parsedCsv[0][cell]
+          startTime: dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell]),
+          endTime: dfns.addHours(dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell]), (dfns.getHours(dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell])) > 17) ? 4 : 3) // If startTime is after 5,  assume 3 hour show shift. Otherwise, assume 4 hours.
         })
       }
     }

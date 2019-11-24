@@ -11,7 +11,7 @@ const UploadSchedule = () =>  {
     formData.append('file', fileField.files[0])
     fetch('http://localhost:5000/uploadFile', { method: 'POST', body: formData })
       .then(r => r.json())
-      .then(r => setNewSchedule(r))
+      .then(r => setNewSchedule(r.shifts))
   }
 
   return (

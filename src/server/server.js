@@ -1,7 +1,9 @@
 const express = require('express')
 const {Pool} = require('pg')
 const multer = require('multer')
+const dfns = require('date-fns')
 const { parseCsv, fillRowHeaders, convertTo24Hour, dateHeadersToISO, makeShiftObjs } = require('./utils/utils')
+const fuzz = require('fuzzball')
 require('dotenv').config()
 
 const PORT = process.env.PORT || 5000
@@ -30,6 +32,32 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
   const result = await pool.query('SELECT employees.name FROM employees ORDER BY employees.name DESC')
   const employees = result.rows.map(obj => obj.name)
 
+  const buildingMapping = {
+    'abravanel': 'abravanel hall',
+    'capitol': 'capitol',
+    'delta hall': 'delta hall',
+    'rsbb': 'regent street',
+    'rose': 'rose wagner'
+  }
+
+  // const getShiftsFromRange = async (startDate, endDate) => {
+  //   const result = await pool.query('SELECT employees.name,\
+  //     shifts.shift_id,\
+  //     shifts.start,\
+  //     shifts.end,\
+  //     buildings.name as building\
+  //       FROM employees, shifts, buildings\
+  //       where shifts.start >= $1\
+  //         and shifts.start <= $2\
+  //         and shifts.employee_id=employees.employee_id\
+  //         AND shifts.building_id=buildings.building_id', [startDate, endDate])
+  //   return result.rows
+  // }
+
+  const determineEmployee = shift => {
+    // TODO
+  }
+
   if (req.file.mimetype === 'text/csv') {
     const csvString = req.file.buffer.toString()  // Single string representation of CSV
     const parsed = parseCsv(csvString) // Makes 2D array representation of csv, with each inner array representing a row
@@ -37,14 +65,26 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
     const filled = fillRowHeaders(formattedDates) // Fills blank first indices in each row with building name
     const amPm = convertTo24Hour(filled) // Identify AM or PM for cells with times
     const shifts = makeShiftObjs(amPm) // Make array of objects {employeeName, startTime, startDate, building}
+    const errors = []
 
+    // Date range from shift objects.
+    const earliestShift = dfns.min(shifts.map(shift => shift.startTime))
+    const latestShift = dfns.max(shifts.map(shift => shift.startTime))
+    
     // TODO: Test shifts, see if catching all, starttimes are correct etc etc
-    // and then put in database
+    // TODO: For all shifts, check name. If name in current list of employees, great. If not, 
+    // figure out who it belongs too. Rule out those scheduled concurrently elsewhere and those scheduled for same shift.
+    // After ruling out as many as possible, check Levenshtein ratio for remaining names.
+    // If ratio very high for only one name, add to that employee with a note (for displaying to the user that it is uncertain).
+    // If ratio does not obviously point to one name, add shift as unowned (display to all candidate owners as possible shift)
+    
+    // Inserts all employee names into DB (doesn't check beyond ON CONFLICT DO NOTHING)
+    shifts.map(async s => {
+      await pool.query('INSERT INTO employees (name) values ($1) ON CONFLICT DO NOTHING', [s.employeeName]).catch(e => errors.push(e))
+      await pool.query('INSERT INTO shifts (building_id, start, "end", employee_id) values ((select building_id from buildings where buildings.name=$1), $2, $3, (select employee_id from employees where employees.name=$4 limit 1))', [buildingMapping[s.building], s.startTime, s.endTime, s.employeeName]).catch(e => errors.push(e))
+    })
 
-    // TODO: Sort out shifts, check each name against employees list. If no match, find closest relative using
-    // Levenshtein ratio. Assume 4 hour shift.
-  
-    res.json(shifts.map(shift => [shift.employeeName, shift.startTime, shift.building]))
+    res.json({errors: errors, shifts: shifts.map(shift => [shift.employeeName, shift.startTime, shift.building])})
 
 
 
@@ -61,7 +101,6 @@ server.get('/employees', async (_req, res) => {
 
 // Get all shifts for an employee by name
 server.get('/employees/:name/shifts', async (req, res) => {
-
   const result = await pool.query('\
     SELECT\
       shifts.start,\

@@ -63,7 +63,9 @@ export const formatShifts = (rows) => {
         _sshift.notes = (shift[0].building_id !== shift[1].building_id || shift[0].building_id !== shift[2].building_id) ? `*To ${toTitleCase(shift[2].building)} at ${to12Hour(switchShift.startHour) + ':' + switchShift.startMin}`: undefined
         return [_sshift]
       default:
-        break
+        // TODO: All cases no longer captured (shift.length >= 3).
+        return shift
+
     }
   })
   let newObj = {}
