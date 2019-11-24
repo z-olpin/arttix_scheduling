@@ -1,5 +1,5 @@
-CREATE TABLE employees (employee_id SERIAL PRIMARY KEY, name TEXT NOT NULL);
-CREATE TABLE buildings (building_id SERIAL PRIMARY KEY, name TEXT NOT NULL);
+CREATE TABLE employees (employee_id SERIAL PRIMARY KEY, name TEXT NOT NULL UNIQUE);
+CREATE TABLE buildings (building_id SERIAL PRIMARY KEY, name TEXT NOT NULL UNIQUE);
 CREATE TABLE shifts (shift_id BIGSERIAL PRIMARY KEY, building_id INT REFERENCES buildings(building_id) NOT NULL, start TIMESTAMP WITH TIME ZONE NOT NULL, "end" TIMESTAMP WITH TIME ZONE NOT NULL, is_show BOOL NOT NULL DEFAULT false, employee_id INT REFERENCES employees(employee_id) );
 
 INSERT INTO employees (name) VALUES ('zach'), ('alice'), ('bob'), ('charlie'), ('dave');
