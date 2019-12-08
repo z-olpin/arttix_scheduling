@@ -13,7 +13,8 @@ export const to12Hour = hour => {
   }
 }
 
-// TODO: Fix this mess. Returns an object with each shift
+// TODO: Fix this mess.
+// Formats shift values and combines shifts with overlapping start/end times
 export const formatShifts = (rows) => {
   let _rows = rows.map(shift => {
     const _shift = { ...shift }
@@ -38,6 +39,7 @@ export const formatShifts = (rows) => {
   
   
   let shiftObjShifts = Object.values(shiftObj).map(shift => {
+    // Combine multiple shifts into one.
     switch(shift.length) {
       case 1:
         return shift
@@ -63,17 +65,15 @@ export const formatShifts = (rows) => {
         _sshift.notes = (shift[0].building_id !== shift[1].building_id || shift[0].building_id !== shift[2].building_id) ? `*To ${toTitleCase(shift[2].building)} at ${to12Hour(switchShift.startHour) + ':' + switchShift.startMin}`: undefined
         return [_sshift]
       default:
-        // TODO: All cases no longer captured (shift.length >= 3).
         return shift
-
     }
   })
-  let newObj = {}
-  shiftObjShifts.map(shiftARR => shiftARR.map(shift => newObj[shift.comparisonStart] = shift))
-  return newObj
+  let newShiftObj = {}
+  shiftObjShifts.map(shiftArr => shiftArr.map(shift => newShiftObj[shift.comparisonStart] = shift))
+  return newShiftObj
 }
 
-// Position a shift div in the schedule grid
+// Get values to appropriately position a shift in UI
 export const defineGridArea = shift => {
   const rowStart = (parseInt(shift.startHour) - 8) * 4 + (parseInt(shift.startMin) / 15) + 2
   const columnStart = parseInt(shift.dow) + 1
