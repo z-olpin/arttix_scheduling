@@ -1,13 +1,14 @@
 const dfns = require('date-fns')
 
+// Make 2d Array from csvString ('asdf,asdf,"as, df",asdf' => [['asdf', 'asdf', 'as df', 'asdf']])
 module.exports.parseCsv = csvString => {
   return csvString.split(/[\n\r]+/) // Split by newline or carriage return
     .map(rowStr => rowStr.replace(/"([\w\,\s]*)"/g, (_match, p1) => p1.replace(",", "")) // Remove "" marks and any commas within them
     .split(",").map(ent => ent.trim().toLowerCase()))
 }
 
+// Fill in blank Row headers with building
 module.exports.fillRowHeaders = parsedCsv => {
-  // Fill in blank Row headers with building
   return parsedCsv
     .reduce((acc,curr,ind) => (curr[0] != '')
       ? acc.concat([curr])
@@ -16,27 +17,15 @@ module.exports.fillRowHeaders = parsedCsv => {
 }
 
 module.exports.convertTo24Hour = parsedCsv => {
-
-  // Find cells with times (9:45) and figure out whether they are meant to be AM or PM
-  // by looking one column left and up until necessary.
-  const getAmPm = (csv, rowNum, colNum) => {
-    let _csv = [...csv]
-    let _rowNum = rowNum - 1
-    let _colNum = colNum - 1
-    if (typeof _csv[_rowNum][_colNum] === 'string' && _csv[_rowNum][_colNum].match(/AM|PM|am|pm/)) {
-      return _csv[_rowNum][_colNum].match(/AM|PM|am|pm/)[0]
-    } else {
-      return getAmPm(_csv, _rowNum, _colNum+1)
-    }
-  }
-
   let _parsedCsv = [...parsedCsv]
-
-  // append am or pm to times
+  let amPmSwitch
   for (let row = 0; row < _parsedCsv.length; row++) {
+    if (typeof _parsedCsv[row][1] === 'string' && _parsedCsv[row][1].trim().match(/^(am|pm)$/)) {
+      amPmSwitch = _parsedCsv[row][1] // Consider rows ahead to be AM or PM
+    }
     for (let column = 2; column < _parsedCsv[row].length; column += 3)  {
       if (typeof _parsedCsv[row][column] === 'string' && _parsedCsv[row][column].match(/\d+:\d\d/)) {
-        _parsedCsv[row][column] += getAmPm(_parsedCsv, row, column)
+        _parsedCsv[row][column] += amPmSwitch // append 'am' or 'pm' to all shift start-times.
       }
     }
   }
@@ -44,7 +33,7 @@ module.exports.convertTo24Hour = parsedCsv => {
 }
 
 module.exports.dateHeadersToISO = parsedCsv => {
-  // Make sure not and Invalid Date Date Object
+  // Make sure not an Invalid Date Object
   const isValidDate = date => (date instanceof Date && !isNaN(date)) ? true : false
 
   // Make ISO timestamps. 'monday august 9' year, hour, etc filled in with values from firstDayOfSchedule
@@ -86,10 +75,10 @@ module.exports.makeShiftObjs = parsedCsv => {
     for (let cell = 0; cell < parsedCsv[row].length; cell++) {
       if (typeof parsedCsv[row][cell] === 'string' && parsedCsv[row][cell].match(/^\d+:\d\d(am|pm)$/)) {
         shifts.push({
-          employeeName: parsedCsv[row][cell - 1],
+          employeeName: (parsedCsv[row][cell - 1] === '') ? 'unknown' : parsedCsv[row][cell - 1],
           building: parsedCsv[row][0],
           startTime: dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell]),
-          endTime: dfns.addHours(dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell]), (dfns.getHours(dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell])) > 17) ? 4 : 3) // If startTime is after 5,  assume 3 hour show shift. Otherwise, assume 4 hours.
+          endTime: dfns.addHours(dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell]), (dfns.getHours(dfns.parse(parsedCsv[row][cell], 'h:mmaa', parsedCsv[0][cell])) > 16) ? 3 : 4) // If startTime is after 5,  assume 3 hour show shift. Otherwise, assume 4 hours.
         })
       }
     }
