@@ -28,30 +28,33 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees }) => {
     let _shifts = {...shifts}
     let val = e.target.value
     let lastInd = _shifts[building][day].length - 1
-    _shifts[building][day][lastInd][0] = val
+    _shifts[building][day][lastInd]['emp'] = val
     setShifts(_shifts)
   }
 
-  const changeHour = (e, building, day) => {
+  const changeTimeIn = (e, building, day) => {
     let _shifts = {...shifts}
     let val = e.target.value
     let lastInd = _shifts[building][day].length - 1
-    _shifts[building][day][lastInd][1] = val
+    _shifts[building][day][lastInd]['in'] = val
     setShifts(_shifts)
   }
-
-  const changeMin = (e, building, day) => {
+  const changeTimeOut = (e, building, day) => {
     let _shifts = {...shifts}
     let val = e.target.value
     let lastInd = _shifts[building][day].length - 1
-    _shifts[building][day][lastInd][2] = val
+    _shifts[building][day][lastInd]['out'] = val
     setShifts(_shifts)
   }
 
   const addShift = (building, day) => {
     let _shifts = {...shifts}
-    _shifts[building][day].push([])
+    _shifts[building][day].push({emp: null, in: null, out: null})
     setShifts(_shifts)
+  }
+  
+  const submitShifts = () => {
+    fetch('http://localhost:5000/shifts', {method: 'POST', body: JSON.stringify(shifts), headers: {'Content-Type': 'application/json'}})
   }
 
   return (
@@ -72,7 +75,14 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees }) => {
               <th>{building}</th>
               {Object.keys(shifts[building]).map(d => (
                 <td>
-                  {shifts[building][d].map((_v, i) => <NewShiftForm changeMin={e => changeMin(e, building, d)} changeHour={e => changeHour(e, building, d)} changeEmployee={e => changeEmployee(e, building, d)} employees={employees}/>)}
+                  {shifts[building][d].map((_v, i) => 
+                    <NewShiftForm
+                      changeTimeIn={e => changeTimeIn(e, building, d)}
+                      changeTimeOut={e => changeTimeOut(e, building, d)}
+                      changeEmployee={e => changeEmployee(e, building, d)}
+                      employees={employees}
+                    />
+                  )}
                   <button onClick={() => addShift(building, d)}>Add a shift</button>
                 </td>
               ))}
@@ -81,6 +91,7 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees }) => {
         </tbody>
       </table>
       <button onClick={() => {console.table(shifts)}}>console.table(shifts)</button>
+      <button onClick={submitShifts}>SUBMIT</button>
     </>
   )
 }
