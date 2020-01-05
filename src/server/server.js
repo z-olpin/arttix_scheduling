@@ -2,6 +2,8 @@ const express = require('express')
 const {Pool} = require('pg')
 const multer = require('multer')
 const dfns = require('date-fns')
+const bodyParser = require('body-parser')
+
 const { parseCsv, fillRowHeaders, convertTo24Hour, dateHeadersToISO, makeShiftObjs } = require('./utils/utils')
 const fuzz = require('fuzzball')
 require('dotenv').config()
@@ -20,6 +22,8 @@ const upload = multer()
 server.use('/dist', express.static('dist'));
 server.use('/uploads', express.static('uploads'));
 server.use('/index.html', express.static('src/public/index.html'))
+server.use(bodyParser.urlencoded({extended: false}))
+server.use(bodyParser.json())
 
 // If no endpoint, redirect
 server.get('/', (_req, res) => {
@@ -96,28 +100,46 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
   }
 })
 
+// Handler for created schedule
+server.post('/shifts', async (req, res) => {
+
+  const buildingNameMap = {
+    'abravanel': 'abravanel hall',
+    'capitol': 'capitol',
+    'delta hall': 'delta hall',
+    'regent street': 'regent street',
+    'rose wagner': 'rose wagner'
+  }
+
+  const shifts = []
+  Object.keys(req.body).map(k1 => {
+    Object.keys(req.body[k1]).map(k2 => {
+        if(req.body[k1][k2].length) {
+            req.body[k1][k2].map(s => {
+              shifts.push({
+                building: k1.toLowerCase(),
+                employee: s.emp.toLowerCase(),
+                startTime: dfns.parse(k2 + ' ' + s.in, 'MMM dd kk:mm', new Date()).toISOString(),
+                outTime: dfns.parse(k2 + ' ' + s.out, 'MMM dd kk:mm', new Date()).toISOString()
+              })
+            })
+        }
+    })
+  })
+  shifts.map(async s => {
+    const res = await pool.query('insert into shifts (building_id, start, "end", employee_id) values ((select building_id from buildings where name=$1), $2, $3, (select employee_id from employees where name=$4))', [buildingNameMap[s.building], s.startTime, s.outTime, s.employee])
+  })
+  res.json(shifts)
+})
+
 // Get all employee names
 server.get('/employees', async (_req, res) => {
-  const result = await pool.query('SELECT employees.name FROM employees ORDER BY employees.name DESC')
+  const result = await pool.query('SELECT employees.name FROM employees ORDER BY employees.name ASC')
   res.json(result.rows)
 })
 
 // Get all shifts for an employee by name
 server.get('/employees/:name/shifts', async (req, res) => {
-
-  // const getShiftsFromRange = async (startDate, endDate) => {
-  //   const result = await pool.query('SELECT employees.name,\
-  //     shifts.shift_id,\
-  //     shifts.start,\
-  //     shifts.end,\
-  //     buildings.name as building\
-  //       FROM employees, shifts, buildings\
-  //       where shifts.start >= $1\
-  //         and shifts.start <= $2\
-  //         and shifts.employee_id=employees.employee_id\
-  //         AND shifts.building_id=buildings.building_id', [startDate, endDate])
-  //   return result.rows
-  // }
 
   const result = await pool.query('\
     SELECT\
