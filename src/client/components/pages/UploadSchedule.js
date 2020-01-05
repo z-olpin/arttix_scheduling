@@ -14,6 +14,11 @@ const UploadSchedule = () =>  {
       .then(r => setNewSchedule(r.shifts))
   }
 
+  const wipeSched = () => {
+    fetch('http://localhost:5000/wipe', { method: 'POST'})
+      .then(r => alert('wiped'))
+  }
+
   return (
     <>
     <form id="file-upload" name="file-upload" onSubmit={fileUpload}>
@@ -24,10 +29,11 @@ const UploadSchedule = () =>  {
     {newSchedule &&
     <table>
       <tbody>
-        {newSchedule.map(row => <tr>{row.map(ent => <td>{ent}</td>)}</tr>)}
+    {newSchedule.map(row => <tr><td>{row[0]}</td><td>{new Date(row[1]).toLocaleString()}</td><td>{row[2]}</td></tr>)}
       </tbody>
     </table>
     }
+    <button onClick={wipeSched}>Clear Schedule</button>
     </>
   )
 }

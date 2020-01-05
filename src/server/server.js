@@ -136,4 +136,11 @@ server.get('/employees/:name/shifts', async (req, res) => {
   res.json(result.rows)
 })
 
+server.post('/wipe', async (_req, res) => {
+  const errors = []
+  await pool.query('delete from shifts where True').catch(e => errors.push(e))
+  await pool.query('alter sequence shifts_shift_id_seq restart with 1').catch(e => errors.push(e))
+  res.json(errors.length ? 'success' : errors)
+})
+
 server.listen(PORT, () => console.log(`Server listening on ${PORT}...`));
