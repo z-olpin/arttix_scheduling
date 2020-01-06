@@ -55,6 +55,7 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees }) => {
   
   const submitShifts = () => {
     fetch('http://localhost:5000/shifts', {method: 'POST', body: JSON.stringify(shifts), headers: {'Content-Type': 'application/json'}})
+      .then(alert('Shifts added!'))
   }
 
   return (
