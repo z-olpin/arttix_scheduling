@@ -16,7 +16,7 @@ const App = () => {
   const presentSunday = format(endOfWeek(Date.now(), { weekStartsOn: 1 }), 'yyyy/MM/dd')
   const [employees, setEmployees] = useState([])
   const weekdayColumnHeaders = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-  const buildings = ['Abravanel', 'Capitol', 'Delta Hall', 'Regent Street', 'Rose Wagner']
+  const buildings = ['Abravanel', 'Capitol', 'Delta', 'Regent', 'Rose']
   const timeRowHeaders = ['8a', '10a', '12p', '2p', '4p', '6p', '8p']
 
   // Get employee names
