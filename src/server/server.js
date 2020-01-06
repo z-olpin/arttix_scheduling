@@ -87,7 +87,7 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
           $3,\
           (select employee_id from employees where employees.name=$4 limit 1)\
         )',
-        [buildingNameMap[s.building],
+        [s.building,
         s.startTime.toISOString(),
         s.endTime.toISOString(),
         s.employeeName]).catch(e => errors.push(e))
@@ -102,14 +102,6 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
 
 // Handler for created schedule
 server.post('/shifts', async (req, res) => {
-
-  const buildingNameMap = {
-    'abravanel': 'abravanel hall',
-    'capitol': 'capitol',
-    'delta hall': 'delta hall',
-    'regent street': 'regent street',
-    'rose wagner': 'rose wagner'
-  }
 
   const shifts = []
   Object.keys(req.body).map(k1 => {
@@ -127,7 +119,7 @@ server.post('/shifts', async (req, res) => {
     })
   })
   shifts.map(async s => {
-    const res = await pool.query('insert into shifts (building_id, start, "end", employee_id) values ((select building_id from buildings where name=$1), $2, $3, (select employee_id from employees where name=$4))', [buildingNameMap[s.building], s.startTime, s.outTime, s.employee])
+    const res = await pool.query('insert into shifts (building_id, start, "end", employee_id) values ((select building_id from buildings where name=$1), $2, $3, (select employee_id from employees where name=$4))', [s.building, s.startTime, s.outTime, s.employee])
   })
   res.json(shifts)
 })
