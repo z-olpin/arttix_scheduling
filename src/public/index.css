@@ -100,3 +100,8 @@ select {
 #file-upload {
   margin: 2rem;
 }
+
+#create-sched {
+  margin: 0 auto;
+  width: 75vw;
+}

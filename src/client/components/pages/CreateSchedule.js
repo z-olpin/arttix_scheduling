@@ -74,10 +74,10 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees }) => {
     <>
     <div id="week-slider">
         <button className="week-button" onClick={() => changeTargetWeek(-1)}>&#8592;</button>
-        <h1 id="week-title">{format(targetWeek[0], 'MM/dd')} - {format(targetWeek[6], 'MM/dd')}</h1>
+        <h2 id="week-title">{format(targetWeek[0], 'MM/dd')} - {format(targetWeek[6], 'MM/dd')}</h2>
         <button className="week-button" onClick={() => changeTargetWeek(1)}>&#8594;</button>
       </div>
-      <table>
+      <table id="create-sched" style={{fontSize: '1rem'}}>
         <thead>
           <tr>
             <th></th>
@@ -91,7 +91,7 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees }) => {
             <tr>
               <th>{building}</th>
               {Object.keys(shifts[building]).map(d => (
-                <td>
+                <td style={{padding: '0.4rem'}}>
                   {shifts[building][d].map((_v, i) => 
                     <NewShiftForm
                       changeTimeIn={e => changeTimeIn(e, building, d)}
@@ -107,7 +107,7 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees }) => {
           ))}
         </tbody>
       </table>
-      <button onClick={submitShifts}>SUBMIT</button>
+      <button onClick={submitShifts} style={{margin: '1rem', position: 'absolute', right: '12.5vw'}}>SUBMIT</button>
       </>
   )
 }
