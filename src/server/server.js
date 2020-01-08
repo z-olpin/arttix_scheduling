@@ -102,7 +102,6 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
 
 // Handler for created schedule
 server.post('/shifts', async (req, res) => {
-
   const shifts = []
   Object.keys(req.body).map(k1 => {
     Object.keys(req.body[k1]).map(k2 => {
@@ -110,9 +109,9 @@ server.post('/shifts', async (req, res) => {
             req.body[k1][k2].map(s => {
               shifts.push({
                 building: k1.toLowerCase(),
-                employee: s.emp.toLowerCase(),
-                startTime: dfns.parse(k2 + ' ' + s.in, 'MMM dd kk:mm', new Date()).toISOString(),
-                outTime: dfns.parse(k2 + ' ' + s.out, 'MMM dd kk:mm', new Date()).toISOString()
+                employee: s.employee.toLowerCase(),
+                startTime: s.startTime,
+                outTime: s.endTime
               })
             })
         }
@@ -131,8 +130,9 @@ server.get('/employees', async (_req, res) => {
 })
 
 // Get all shifts for an employee by name
-server.get('/employees/:name/shifts', async (req, res) => {
+server.post('/employees/:name/shifts', async (req, res) => {
 
+  const [rangeBegin, rangeEnd] = req.body
   const result = await pool.query('\
     SELECT\
       shifts.start,\
@@ -144,9 +144,11 @@ server.get('/employees/:name/shifts', async (req, res) => {
     WHERE\
       employees.name=$1 AND\
       shifts.employee_id=employees.employee_id AND\
-      shifts.building_id=buildings.building_id\
+      shifts.building_id=buildings.building_id AND\
+      shifts.start between $2 and $3\
     ORDER BY shifts.start ASC\
-  ', [req.params.name])
+  ', [req.params.name, rangeBegin, rangeEnd]
+  )
   res.json(result.rows)
 })
 
