@@ -1,4 +1,4 @@
-# Schedule Web App for ArtTix (in prog)
+# Schedule Web App for ArtTix (in prog) 
 
 Screenshot of current progress:
 

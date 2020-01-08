@@ -107,7 +107,6 @@ const CreateSchedule = ({weekdayColumnHeaders, buildings, employees }) => {
           ))}
         </tbody>
       </table>
-      <button onClick={() => {console.table(shifts)}}>console.table(shifts)</button>
       <button onClick={submitShifts}>SUBMIT</button>
       </>
   )
