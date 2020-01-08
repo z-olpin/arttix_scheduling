@@ -1,14 +1,15 @@
 import React from "react";
 import { defineGridArea, to12Hour, toTitleCase } from "../../utils/utils";
+import { format } from "date-fns";
 
-const ViewSchedule = ({ shifts, weekdayColumnHeaders, timeRowHeaders }) => {
+const ViewSchedule = ({ targetWeekRange, changeTargetWeek, shifts, weekdayColumnHeaders, timeRowHeaders }) => {
 
   return (
     <div id="container">
       <div id="week-slider">
-        <button className="week-button">&#8592;</button>
-        <h3 id='week-title'>This week</h3>
-        <button className="week-button">&#8594;</button>
+        <button className="week-button" onClick={() => changeTargetWeek(-1)}>&#8592;</button>
+        <h1 id="week-title">{format(targetWeekRange[0], 'MM/dd')} - {format(targetWeekRange[1], 'MM/dd')}</h1>
+        <button className="week-button" onClick={() => changeTargetWeek(1)}>&#8594;</button>
       </div>
       <div id="schedule">
         {/* TODO: This draws the horizontal lines. But no need to make a 62 spans, just make one for each line */}
