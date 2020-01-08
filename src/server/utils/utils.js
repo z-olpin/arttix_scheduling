@@ -41,10 +41,6 @@ module.exports.dateHeadersToISO = parsedCsv => {
     const startOfPresentWeek = dfns.startOfWeek(new Date(), {weekStartsOn: 1})
     const startOfNextWeek = dfns.addWeeks(startOfPresentWeek, 1)
     let firstDayOfSchedule = dfns.parse(dateRow[1], 'EEEE MMMM d', startOfNextWeek)
-    if (firstDayOfSchedule < startOfNextWeek) {
-      // In case new schedule is for two weeks out in new year (firstDayOfSchedule will be one year behind.)
-      firstDayOfSchedule = dfns.addYears(firstDayOfSchedule, 1)
-    }
     let _dateRow = dateRow.map(cell => {
       let _cell = dfns.parse(cell, 'EEEE MMMM d', firstDayOfSchedule) // EEEE MMMM d: day, month, day-of-month
       if (isValidDate(_cell)) {
