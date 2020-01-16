@@ -36,16 +36,6 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
   const result = await pool.query('SELECT employees.name FROM employees ORDER BY employees.name DESC')
   const employees = result.rows.map(obj => obj.name)
 
-  // TODO: Make a dictionary of equivalencies for e.g. building names, employee names/nicknames, etc.
-
-  const buildingNameMap = {
-    'abravanel': 'abravanel hall',
-    'capitol': 'capitol',
-    'delta hall': 'delta hall',
-    'rsbb': 'regent street',
-    'rose': 'rose wagner'
-  }
-
   if (req.file.mimetype === 'text/csv') {
     const csvString = req.file.buffer.toString()  // Single string representation of CSV
     const parsed = parseCsv(csvString) // Makes 2D array representation of csv, with each inner array representing a row
@@ -54,10 +44,6 @@ server.post('/uploadFile', upload.single('file'), async (req, res) => {
     const amPm = convertTo24Hour(filled) // Identify AM or PM for cells with times
     const shifts = makeShiftObjs(amPm) // Make array of objects {employeeName, startTime, startDate, building}
     const errors = []
-
-    // Date range from csv.
-    const earliestShift = dfns.min(shifts.map(shift => shift.startTime))
-    const latestShift = dfns.max(shifts.map(shift => shift.startTime))
 
     // Select most recent date from shifts in DB
     const lastDate = await pool.query('SELECT MAX(start) FROM shifts')
